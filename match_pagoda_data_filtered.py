@@ -28,4 +28,16 @@ for x, gn in enumerate(genes):
 export = pd.DataFrame(export_data)
 export.to_csv('./data/rna/rank_normalization_filtered.csv', header=None, index=False)
 
+variability_and_expression_data = []
+variability_data = []
 
+for x, gn in enumerate(genes):
+    if gn in express_dict.keys():
+        variability_and_expression_data.append([gn, express_dict[gn], var[x]])
+        variability_data.append([gn, var[x]])
+
+
+variability_and_expression_data_df = pd.DataFrame(variability_and_expression_data)
+variability_data_df = pd.DataFrame(variability_data)
+variability_and_expression_data_df.to_csv("./data/rna/gene_expression_variability.csv", header=None, index=False)
+variability_data_df.to_csv("./data/rna/gene_variability.csv", header=None, index=False)
