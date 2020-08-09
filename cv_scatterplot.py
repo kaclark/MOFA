@@ -12,7 +12,7 @@ for row in cv_data[1]:
     cv.append(row)
 mean = []
 for row in cv_data[2]:
-    mean.append(row)
+    mean.append(math.log10(row))
 #norm_mean = [float(i)/max(mean) for i in mean]
 scaled_cv = []
 for val in cv:
@@ -25,25 +25,4 @@ plt.xlabel("Average transcript counts")
 plt.scatter(mean, scaled_cv, s=1, color='purple')
 plt.show()
 
-
-plt.title("Raw Transcript counts from single-cells")
-plt.ylabel("Noise in transript counts log(CV^2)")
-plt.xlabel("Average transcript counts")
-plt.xlim(-5,500)
-plt.scatter(mean, scaled_cv, s=1, color='purple')
-plt.show()
-
-plt.title("Raw Transcript counts from single-cells")
-plt.ylabel("Noise in transript counts log(CV^2)")
-plt.xlabel("Average transcript counts")
-plt.xlim(-5,150)
-plt.scatter(mean, scaled_cv, s=1, color='purple')
-plt.show()
-
-plt.title("Raw Transcript counts from single-cells")
-plt.ylabel("Noise in transript counts log(CV^2)")
-plt.xlabel("Average transcript counts")
-plt.xlim(-5,60)
-plt.scatter(mean, scaled_cv, s=1, color='purple')
-plt.show()
 
