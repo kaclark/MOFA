@@ -9,3 +9,6 @@
 *.pdf
 *.csv
 *.tsv 
+*.bed
+*.idx
+*.rds
