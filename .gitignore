@@ -12,3 +12,7 @@
 *.bed
 *.idx
 *.rds
+.RData 
+.Rhistory 
+*.swo 
+*.swp 
