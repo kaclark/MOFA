@@ -23,6 +23,7 @@ rna_data = read.csv('./data/rna/qc_counts.txt', row.names=1, header=TRUE, sep='\
 del_list <- setdiff(rownames(rna_data), ensembl)
 rna_data <- rna_data[-which(rownames(rna_data) %in% del_list),]
 #replace ensembl ids with gene symbols
+#keeps throwing error
 rownames(rna_data) <- replace(rownames(rna_data), match(names(symb), rownames(rna_data), symb))
 
 counts <- CreateSeuratObject(counts = rna_data, project = 'mRNA', min.cells = 1, min.features = 2)
@@ -31,17 +32,28 @@ counts[["percent.mt"]] <- PercentageFeatureSet(counts, pattern = "^mt-")
 counts <- subset(percent.mt < 5)
 counts <- NormalizeData(counts, normalization.method = "LogNormalize", scale.factor = 10000)
 norm_data <- GetAssayData(counts)
-gini <- apply(x <- norm_data, 1, function(x) ineq(x, type="Gini"))
-#saveRDS(counts, 'data/rna/normalized_rna_data.rds')
-mean_data <- read.csv('./data/rna/pagoda_mean_expression_sorted.csv', row.names=1, header=TRUE, sep=',')
-rownames(mean_data) <- replace(rownames(mean_data), match(names(symb), rownames(mean_data)), symb)
-sym_del_list <- setdiff(names(gini), rownames(mean_data))
-gini_cor_mean <- lapply(x <- match(rownames(mean_data), names(gini)), function(x) gini[x])
 
-png(file = "Gini_mean_expression.png")
-plot(x=unlist(mean_data),y=unlist(gini_cor_mean),xlab="Mean Gene Expression",ylab="Gini Coefficent", main="Mean Gene Expression vs Gini Coefficent")
-dev.off()
+runKlein <- function(data, noise){
+  pergene.avgread = rowMeans(data)
+  percell.totalreads = colSums(data)
+  allcell.totalreads = sum(percell.totalreads)
+  avgcell.totalreads = colSums(data)
+  percell.normalization = avgcell.totalreads / percell.totalreads
+  data.normalized = (t(t(data) * percell.normalization))
+  
+  pergene.countvariance = apply(data.normalized, 1, var)
+  pergene.countaverage = rowMeans(data.normalized)
+  pergene.COV2 = pergene.countvariance / (pergene.countaverage ^ 2)
+  allcell.countvariance = var(percell.totalreads)
+  allcell.countaverage = mean(percell.totalreads)
+  allcell.COV2 = allcell.countvariance / (allcell.countaverage ^ 2)
+  noise2 = noise ^ 2
+  
+  stats = pergene.COV2 / ((1 + allcell.COV2)*(1 + noise2)/pergene.countaverage + noise2)
+  statsdf = data.frame(stats)
+  
+  statsdf = statsdf[order(-statsdf$stats), , drop = FALSE]
+  return(statsdf)
+}
 
-png(file = "Gini_mean_expression_log10.png")
-plot(x=log10(unlist(mean_data)),y=unlist(gini_cor_mean),xlab="Mean Gene Expression log10",ylab="Gini Coefficent", main="Mean Gene Expression vs Gini Coefficent")
-dev.off()
+wtnorm_klein = runKlein(norm_data, 0.25)

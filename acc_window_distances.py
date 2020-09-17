@@ -16,9 +16,9 @@ with open('./data/acc/acc_windows.bed', 'r+b') as input_map:
 distances = []
 for chrom in chroms:
     windows_in_chrom = [[win[1],win[2]] for win in windows if str(win[0]) == str(chrom)]
-    win_in_chrom = sorted(windows_in_chrom.sort, key=lambda x: int(x[1]))
+    win_in_chrom = sorted(windows_in_chrom, key=lambda x: int(x[1]))
     for ind, window in enumerate(win_in_chrom):
-        if ind == (len(windows_in_chrom) -1):
+        if ind == (len(win_in_chrom) -1):
             continue
         next_window = win_in_chrom[ind + 1]
         window_end = window[1]
